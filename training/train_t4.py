@@ -323,7 +323,7 @@ def train_t4(data_path=None, n_steps=50000, batch_size=4, lr=3e-4,
     if torch.cuda.is_available():
         device = torch.device('cuda')
         gpu_name = torch.cuda.get_device_name(0)
-        vram_total = torch.cuda.get_device_properties(0).total_mem / 1e9
+        vram_total = getattr(torch.cuda.get_device_properties(0), "total_memory", getattr(torch.cuda.get_device_properties(0), "total_mem", 0)) / 1e9
         print(f"Device: {gpu_name} ({vram_total:.1f} GB VRAM)")
     else:
         device = torch.device('cpu')
