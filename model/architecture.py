@@ -101,12 +101,20 @@ class DreamGTMConfig:
 # ============================================================
 SPECIAL_TOKENS = {
     "<PAD>": 0, "<BOS>": 1, "<EOS>": 2, "<UNK>": 3,
-    "<USER>": 4, "<ASSISTANT>": 5, "<THINK>": 6,
-    "<CODE>": 7, "<PATCH>": 8, "<TEST>": 9,
-    "<SEARCH>": 10, "<TOOL>": 11, "<RESULT>": 12,
-    "<SECURITY_REPORT>": 13, "<DREAM_STATE>": 14,
-    "<VERIFY>": 15, "<END_THINK>": 16,
-    "<SYSTEM>": 17, "<EXPLAIN>": 18,
+    "<SYSTEM>": 4, "</SYSTEM>": 5,
+    "<USER>": 6, "</USER>": 7,
+    "<ASSISTANT>": 8, "</ASSISTANT>": 9,
+    "<THINK>": 10, "</THINK>": 11,
+    "<CODE>": 12, "</CODE>": 13,
+    "<PATCH>": 14, "</PATCH>": 15,
+    "<TEST>": 16, "</TEST>": 17,
+    "<SEARCH>": 18, "</SEARCH>": 19,
+    "<TOOL>": 20, "</TOOL>": 21,
+    "<RESULT>": 22, "</RESULT>": 23,
+    "<SECURITY_REPORT>": 24, "</SECURITY_REPORT>": 25,
+    "<MICROCODE>": 26, "</MICROCODE>": 27,
+    "<VERIFY>": 28, "</VERIFY>": 29,
+    "<DREAM_STATE>": 30, "</DREAM_STATE>": 31,
 }
 
 

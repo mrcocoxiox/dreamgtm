@@ -108,9 +108,14 @@ class PackedDataset(IterableDataset):
         
         with self._opener() as f:
             count = 0
+            lines_read = 0
+            max_lines = self.limit * 100 if self.limit else None  # Safety: don't read forever
             for line in f:
+                lines_read += 1
                 if self.limit and count >= self.limit:
                     break
+                if max_lines and lines_read > max_lines:
+                    break  # Safety: don't read more than 100x the limit
                 line = line.strip()
                 if not line:
                     continue
@@ -141,6 +146,10 @@ class PackedDataset(IterableDataset):
                         buffer_tokens = buffer_tokens[self.max_seq_len:]
                         buffer_labels = buffer_labels[self.max_seq_len:]
                         
+                        # Skip if no assistant tokens (all -100 labels = no learning signal)
+                        if all(l == -100 for l in seq_labels):
+                            continue
+                        
                         # Build attention_mask (all 1s, no padding)
                         attention_mask = [1] * len(seq_tokens)
                         
@@ -151,6 +160,23 @@ class PackedDataset(IterableDataset):
                         }
                 except (json.JSONDecodeError, Exception):
                     continue
+            
+            # Yield remaining buffer as final sequence (padded) — only if it has assistant tokens
+            if buffer_tokens and len(buffer_tokens) >= 10:
+                # Check if there are any non-(-100) labels
+                if any(l != -100 for l in buffer_labels):
+                    # Pad to max_seq_len
+                    pad_len = self.max_seq_len - len(buffer_tokens)
+                    if pad_len > 0:
+                        buffer_tokens.extend([SPECIAL_TOKENS['<PAD>']] * pad_len)
+                        buffer_labels.extend([-100] * pad_len)
+                    attention_mask = [1] * (self.max_seq_len - pad_len) + [0] * pad_len
+                    yield {
+                        'input_ids': torch.tensor(buffer_tokens[:self.max_seq_len], dtype=torch.long),
+                        'attention_mask': torch.tensor(attention_mask[:self.max_seq_len], dtype=torch.long),
+                        'labels': torch.tensor(buffer_labels[:self.max_seq_len], dtype=torch.long),
+                    }
+
 
 
 def collate_packed(batch):
@@ -174,7 +200,8 @@ def collate_packed(batch):
 
 def create_optimizer(model, lr, use_8bit=True, use_paged=False):
     """Create memory-efficient optimizer."""
-    if use_8bit:
+    # 8-bit optimizer requires CUDA
+    if use_8bit and torch.cuda.is_available():
         try:
             import bitsandbytes as bnb
             if use_paged:
@@ -191,8 +218,11 @@ def create_optimizer(model, lr, use_8bit=True, use_paged=False):
             return opt
         except ImportError:
             print(f"  bitsandbytes not available, falling back to AdamW")
+        except Exception as e:
+            print(f"  8-bit optimizer failed ({e}), falling back to AdamW")
     
-    # Fallback: standard AdamW
+    # Fallback: standard AdamW (works on CPU and GPU)
+    print(f"  Optimizer: AdamW (standard)")
     return torch.optim.AdamW(
         model.parameters(), lr=lr, weight_decay=0.01, betas=(0.9, 0.95)
     )
