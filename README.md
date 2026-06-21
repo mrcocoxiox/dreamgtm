@@ -128,3 +128,33 @@ Raw code → Security Microcode → DreamGTM → Patch Operator → Verifier →
 ```
 
 Crafted with love by IBR (Ibraheem)
+
+## Download Data (Release v1.0)
+
+The large data files are in [Release v1.0](https://github.com/mrcocoxiox/dreamgtm/releases/tag/v1.0):
+
+```bash
+# Download all data files
+mkdir -p data
+cd data
+wget https://github.com/mrcocoxiox/dreamgtm/releases/download/v1.0/dreamgtm.tokenizer.json
+wget https://github.com/mrcocoxiox/dreamgtm/releases/download/v1.0/system_prompt.txt
+wget https://github.com/mrcocoxiox/dreamgtm/releases/download/v1.0/security_balanced.jsonl.gz
+wget https://github.com/mrcocoxiox/dreamgtm/releases/download/v1.0/val_split.jsonl
+wget https://github.com/mrcocoxiox/dreamgtm/releases/download/v1.0/train_split.jsonl.gz
+```
+
+| File | Size | Description |
+|------|------|-------------|
+| dreamgtm.tokenizer.json | 2.2 MB | 32K BPE tokenizer |
+| system_prompt.txt | 765 bytes | System prompt (stored once) |
+| security_balanced.jsonl.gz | 16 MB | 20K high-signal patching records |
+| val_split.jsonl | 94 MB | 40K validation records |
+| train_split.jsonl.gz | 734 MB | 1.31M training records |
+| **Total** | **846 MB** | |
+
+## Colab Notebook
+
+[DreamGTM_Training_Colab.ipynb](https://github.com/mrcocoxiox/dreamgtm/releases/download/v1.0/DreamGTM_Training_Colab.ipynb) — Open in Google Colab with GPU runtime.
+
+Crafted with love by IBR (Ibraheem)
