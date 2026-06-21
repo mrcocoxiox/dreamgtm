@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Models (large files — use Git LFS or external storage)
+*.pt
+*.bin
+*.safetensors
+*.ckpt
+
+# Data — large files (use Git LFS or release assets)
+data/train_split.jsonl.gz
+data/val_split.jsonl
+data/security_balanced.jsonl.gz
+data/raw_extra/
+data/verified/*.jsonl
+data/tokenizer_corpus.txt
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.key
+*.pem
+credentials*.txt

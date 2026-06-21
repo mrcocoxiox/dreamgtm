@@ -1,0 +1,15 @@
+model:
+  name: "DreamGTM-1B"
+  vocab_size: 32000
+  hidden_size: 2048
+  intermediate_size: 5504
+  n_layers: 24
+  n_heads: 16
+  n_kv_heads: 4
+  max_seq_len: 2048
+  gradient_checkpointing: true
+training:
+  steps: 50000
+  batch_size: 2
+  lr: 2e-4
+creator: "Ibraheem (IBR)"

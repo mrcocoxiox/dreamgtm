@@ -1,0 +1,31 @@
+{
+  "total_input_records": 1484338,
+  "total_output_records": 1353354,
+  "skipped_invalid": 17,
+  "skipped_dup": 130967,
+  "by_type": {
+    "codesearchnet_function": 778695,
+    "github_code_file": 78486,
+    "instruction": 98042,
+    "apps_problem": 4961,
+    "wizardlm_evol_instruct": 244,
+    "alpaca_code": 3,
+    "ultrachat_code": 88,
+    "mbpp_problem": 963,
+    "magicoder_oss_instruct": 42241,
+    "capybara_code": 93,
+    "openorca_code": 325,
+    "gpt4_llm_code": 350,
+    "oasst_code": 884,
+    "norobots": 446,
+    "openhermes_code": 78777,
+    "python_doc": 496,
+    "python_source": 1520,
+    "security_doc": 1588,
+    "security_patch": 3210,
+    "vulnerability": 261942
+  },
+  "bytes_written": 4045145755,
+  "mb_written": 4045.1,
+  "generated_at": "2026-06-21T14:00:18.835651"
+}
