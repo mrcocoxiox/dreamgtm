@@ -2,7 +2,73 @@
 
 **Crafted with love by IBR (Ibraheem)**
 
-A compact AI that **codes** and **patches security vulnerabilities** across web, exe, APK, and config targets. Trained from scratch on T4 GPU using the **IBR Method** (7 CS tricks) + **5 novel methods** + **3 "impossible" achievements**.
+A compact AI that **codes** and **patches security vulnerabilities**. Trained from scratch on T4 GPU using the **IBR Method** (7 CS tricks).
+
+## ⚠️ HONEST STATUS (No False Claims)
+
+### What's PROVEN to work:
+| Component | Status | How Verified |
+|-----------|--------|-------------|
+| Architecture (GQA+RoPE+SwiGLU+RMSNorm) | ✅ REAL | Forward/backward pass tested |
+| Tokenizer (32K BPE) | ✅ REAL | 100% roundtrip fidelity |
+| Dataset (1.31M records) | ✅ REAL | Collected from 14 sources, AST-verified |
+| Training pipeline (IBR Method) | ✅ REAL | Loss decreasing on Colab (10→6→...) |
+| Security microcode (18 patterns) | ✅ REAL | Retriever tested, correct retrieval |
+| T4 optimization (8-bit Adam, packing, checkpointing) | ✅ REAL | VRAM fits 16GB, checkpoints save |
+
+### What's THEORETICAL (architecture designed, not yet proven with real AI):
+| Component | Status | Why |
+|-----------|--------|-----|
+| Zero-Error Architecture | ⚠️ DESIGN ONLY | Code structure is sound, but tested with templates not AI |
+| Zero-Loss Architecture | ⚠️ DESIGN ONLY | Lookup table works mathematically, not connected to model |
+| Zero-Hallucination | ⚠️ DESIGN ONLY | Knowledge base approach is sound, not tested with AI |
+| 5 Novel Methods | ⚠️ CODE ONLY | CMA tested for speed, others need real model |
+| Benchmark suite | ⚠️ PARTIAL | Tests architecture/data, not model output |
+
+### What's NOT YET DONE:
+| Item | Why |
+|------|-----|
+| Real model evaluation | Model still training on Colab |
+| Real code generation test | Need trained checkpoint |
+| Real security patching test | Need trained checkpoint |
+| Real loss measurement | Need trained checkpoint |
+| Novel methods validation | Need trained model + more compute |
+
+## 📁 Project Structure (27 files, clean)
+
+```
+dreamgtm/
+├── model/architecture.py          # DreamGTM transformer
+├── tokenizer/__init__.py          # 32K BPE tokenizer
+├── training/train_t4.py           # IBR Method training (7 tricks)
+├── inference/smart_inference.py   # Smart inference engine
+├── agent/                         # Agent + verifier + scanner
+├── cli/dreamgtm.py                # CLI interface
+├── eval/
+│   ├── real_eval.py               # REAL evaluation (no shortcuts)
+│   ├── eval_harness.py            # Basic eval harness
+│   └── comprehensive_benchmarks.py # Benchmark suite
+├── research/
+│   ├── zero_error_architecture.py # DESIGN: 0% error via verifier
+│   ├── zero_loss_architecture.py  # DESIGN: 0.0 loss via lookup table
+│   ├── zero_hallucination.py      # DESIGN: 0% hallucination via grounding
+│   ├── novel_methods.py           # 5 novel methods (CMA tested)
+│   └── security_microcode_v0/     # 18 microcodes
+├── scripts/                       # Tokenizer, split, quantize
+└── configs/                       # 80M, 350M, 1B YAML
+```
+
+## 🧠 The IBR Method (7 CS Tricks for T4 Training)
+
+| # | Trick | Effect |
+|---|-------|--------|
+| 1 | Sequence packing | 4-5x more tokens/batch |
+| 2 | 8-bit AdamW | Saves 6GB VRAM |
+| 3 | FP16 mixed precision | 2x gradient savings |
+| 4 | Gradient checkpointing | Activations 3GB→1GB |
+| 5 | Curriculum learning | Disabled (T4 OOM fix) |
+| 6 | Importance sampling | Security 5x oversampled |
+| 7 | Microcode conditioning | Inject defensive patterns |
 
 ## 🏗️ Architecture
 
@@ -10,92 +76,22 @@ A compact AI that **codes** and **patches security vulnerabilities** across web,
 Input → [Embedding] → [Transformer × N (GQA + RoPE + SwiGLU + RMSNorm)] → [Output]
 ```
 
-| Model | Params | FP16 | INT4 | Context |
-|-------|--------|------|------|---------|
-| 80M | 50M | 96 MB | 24 MB | 2048 |
-| 350M | 205M | 391 MB | 98 MB | 2048 |
-| 1B | 1.13B | 2.3 GB | 565 MB | 2048 |
+| Model | Params | FP16 | INT4 |
+|-------|--------|------|------|
+| 80M | 50M | 96 MB | 24 MB |
+| 350M | 205M | 391 MB | 98 MB |
+| 1B | 1.13B | 2.3 GB | 565 MB |
 
-## 🏆 3 "Impossible" Achievements (Made Possible)
-
-### 1. Zero Error (0% error rate) ✅ PROVEN
-- **Research says:** AI always makes errors
-- **Our result:** 0% error on security patches (verified correct)
-- **How:** Neural generates → verifier checks → fallback guarantees
-- **Test:** 5/5 security patches verified correct
-
-### 2. Zero Loss (exact 0.0) ✅ PROVEN
-- **Research says:** "LLM loss can never be exactly zero" (arXiv)
-- **Our result:** Loss = 0.0 on memorized contexts (p=1)
-- **How:** Lookup table (deterministic) + grammar mask + neural
-- **Test:** Context [100,200,...,800] → token 900, Loss: 0.0
-
-### 3. Zero Hallucination (0%) ✅ PROVEN
-- **Research says:** "LLMs Will Always Hallucinate" (arXiv 2024)
-- **Our result:** 0% hallucination (by construction)
-- **How:** Grounded KB + verification + template + safe refusal
-- **Test:** 11/11 queries verified, 0 hallucination
-
-## 📁 Project Structure (Clean — 26 files)
-
-```
-dreamgtm/
-├── model/architecture.py          # DreamGTM transformer
-├── tokenizer/__init__.py          # 32K BPE tokenizer + chat encoder
-├── training/train_t4.py           # IBR Method (7 tricks) training
-├── inference/smart_inference.py   # Smart inference (INT8/FP16 auto)
-├── agent/
-│   ├── dreamgtm_agent.py          # Agentic mode (never refuses)
-│   ├── verifier.py                # Patch verifier
-│   └── scanner_runner.py          # Security scanners
-├── cli/dreamgtm.py                # CLI: chat, scan, patch, eval, microcode
-├── eval/eval_harness.py           # 6 eval suites
-├── research/
-│   ├── zero_error_architecture.py # 0% error (verified outputs)
-│   ├── zero_loss_architecture.py  # 0.0 loss (lookup table)
-│   ├── zero_hallucination.py      # 0% hallucination (grounded)
-│   ├── novel_methods.py           # 5 novel methods (tested)
-│   └── security_microcode_v0/     # 18 microcodes, 12 categories
-├── scripts/
-│   ├── train_tokenizer.py         # BPE trainer
-│   ├── split_ultra.py             # Dataset splitter
-│   ├── build_security_balanced.py # Security subset
-│   └── quantize_model.py          # FP16/INT8/INT4/distillation
-└── configs/                       # 80M, 350M, 1B YAML
-```
-
-## 🧠 The IBR Method (7 CS Tricks for T4)
-
-| # | Trick | Effect |
-|---|-------|--------|
-| 1 | Sequence packing | 4-5x more tokens/batch |
-| 2 | 8-bit AdamW | Saves 6GB VRAM |
-| 3 | FP16 mixed precision | 2x gradient memory savings |
-| 4 | Gradient checkpointing | Activations 3GB→1GB |
-| 5 | Curriculum learning | Disabled (T4 OOM fix) |
-| 6 | Importance sampling | Security patches 5x oversampled |
-| 7 | Microcode conditioning | Inject defensive primitives |
-
-## 🚀 5 Novel Methods (Tested + Verified)
-
-| Method | Test Result | Status |
-|--------|-------------|--------|
-| CEGT (Code-Execution Training) | 100% verification accuracy | ⭐⭐⭐ |
-| SGC (Self-Generated Curriculum) | Pipeline works | ⭐⭐⭐ |
-| LAQ (Loss-Annealed Quantization) | 8x size reduction | ⭐⭐ |
-| MIW (Microcode-Injected Weights) | Injection works | ⭐ |
-| CMA (Crystal Memory Attention) | 2.5x faster at seq>1024 | ⭐ |
-
-## 📊 Training Data
+## 📊 Training Data (REAL, verified)
 
 | Source | Records | Type |
 |--------|---------|------|
-| CodeSearchNet | 778K | Code completion |
-| OSV.dev vulnerabilities | 262K | Security knowledge |
-| OpenHermes code | 79K | Code Q&A |
-| github-code Python | 78K | Whole files |
-| Security balanced | 20K | 70% patching |
-| Real CVE patches | 3.2K | Real fix diffs |
+| CodeSearchNet | 778K | Code |
+| OSV.dev | 262K | Vulnerabilities |
+| OpenHermes | 79K | Code Q&A |
+| github-code | 78K | Files |
+| Security balanced | 20K | Patching |
+| CVE patches | 3.2K | Real fixes |
 | **Total** | **1.31M** | |
 
 ## 🔧 Usage
@@ -105,36 +101,29 @@ dreamgtm/
 python training/train_t4.py --config 1b --steps 15000 --batch-size 1 --max-seq-len 256
 ```
 
-### Test "Impossible" Achievements
+### REAL Evaluation (after training)
 ```bash
-python research/zero_error_architecture.py      # 0% error
-python research/zero_loss_architecture.py       # 0.0 loss
-python research/zero_hallucination.py           # 0% hallucination
+python eval/real_eval.py --model models/dreamgtm_1b_t4_step15000.pt
 ```
 
 ### Compress
 ```bash
-python scripts/quantize_model.py --input models/dreamgtm_1b.pt --all --distill
-```
-
-### Chat
-```bash
-python -m cli.dreamgtm chat
+python scripts/quantize_model.py --input models/dreamgtm_1b.pt --all
 ```
 
 ## 📦 GitHub
 
 - **Repo:** https://github.com/mrcocoxiox/dreamgtm
 - **Release v1.0:** Data + notebooks (846 MB)
-- **Colab:** DreamGTM_FINAL.ipynb (one-click training + zero-error chat)
+- **Colab:** DreamGTM_FINAL.ipynb
 
-## 🎯 Honest Limitations
+## 🎯 Next Steps (HONEST)
 
-1. **15K steps on T4** = ~5 hours (fits one Colab session)
-2. **From-scratch 1B** = demo quality for general chat
-3. **Security patches** = always correct (zero-error architecture)
-4. **General code** = needs more training (50K+ steps)
-5. **Zero hallucination** = only for code/security/facts in KB
+1. **Complete training** (15K steps on T4, ~5 hours)
+2. **Run REAL evaluation** (`python eval/real_eval.py --model ...`)
+3. **Report ACTUAL numbers** (even if bad)
+4. **Then validate** zero-error/loss/hallucination claims with real AI
+5. **Test novel methods** with trained model
 
 ---
 
