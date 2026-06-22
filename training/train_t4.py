@@ -257,13 +257,12 @@ def get_amp_dtype(device):
 # ============================================================
 
 def get_curriculum_seq_len(step, max_seq_len):
-    """Curriculum schedule: start short, grow."""
-    if step < 5000:
-        return min(256, max_seq_len)
-    elif step < 15000:
-        return min(512, max_seq_len)
-    else:
-        return max_seq_len
+    """Curriculum schedule: start short, grow.
+    DISABLED for T4 safety — always use max_seq_len to avoid OOM on resume.
+    Enable curriculum only if you have >16GB VRAM (A100/L4).
+    """
+    # For T4: always return max_seq_len (no growth = no OOM on resume)
+    return max_seq_len
 
 
 # ============================================================
