@@ -359,12 +359,28 @@ class DreamGTM(nn.Module):
     
     @torch.no_grad()
     def generate(self, input_ids, max_new_tokens=512, temperature=0.2,
-                 top_k=50, top_p=0.9, repetition_penalty=1.1, eos_token_id=2):
-        """Generate with KV cache for speed"""
+                 top_k=50, top_p=0.9, repetition_penalty=1.1, eos_token_id=2,
+                 attention_mask=None):
+        """Generate with KV cache for speed.
+        
+        Args:
+            input_ids: (B, T) token IDs
+            attention_mask: (B, T) — 1=valid, 0=padding. CRITICAL for correct generation!
+            max_new_tokens: max tokens to generate
+            temperature: sampling temperature
+            top_k: top-k sampling
+            top_p: nucleus sampling
+            repetition_penalty: penalty for repeated tokens
+            eos_token_id: stop token
+        """
         self.eval()
         
-        # Prefill
-        logits, past_kvs = self.forward(input_ids, use_cache=True)
+        # Build attention_mask if not provided (assume all valid)
+        if attention_mask is None:
+            attention_mask = torch.ones_like(input_ids)
+        
+        # Prefill — MUST pass attention_mask to ignore padding!
+        logits, past_kvs = self.forward(input_ids, attention_mask=attention_mask, use_cache=True)
         
         for _ in range(max_new_tokens):
             next_logits = logits[:, -1, :] / max(temperature, 1e-6)
@@ -397,7 +413,7 @@ class DreamGTM(nn.Module):
             
             input_ids = torch.cat([input_ids, next_token], dim=1)
             
-            # Decode with KV cache
+            # Decode with KV cache — new token is always valid (mask=1)
             logits, past_kvs = self.forward(next_token, past_kvs=past_kvs, use_cache=True)
         
         return input_ids
