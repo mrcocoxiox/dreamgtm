@@ -618,19 +618,44 @@ if __name__ == '__main__':
     
     val_path = args.val_path or str(DATA_DIR / 'val_split.jsonl')
     
-    train_t4(
-        data_path=args.data_path,
-        n_steps=args.steps,
-        batch_size=args.batch_size,
-        lr=args.lr,
-        config_name=args.config,
-        max_seq_len=args.max_seq_len,
-        val_path=val_path,
-        val_every=args.val_every,
-        checkpoint_every=args.checkpoint_every,
-        limit=args.limit,
-        use_packing=not args.no_packing,
-        use_8bit_optim=not args.no_8bit_optim,
-        use_curriculum=not args.no_curriculum,
-        use_microcode_injection=not args.no_microcode,
-    )
+    try:
+        train_t4(
+            data_path=args.data_path,
+            n_steps=args.steps,
+            batch_size=args.batch_size,
+            lr=args.lr,
+            config_name=args.config,
+            max_seq_len=args.max_seq_len,
+            val_path=val_path,
+            val_every=args.val_every,
+            checkpoint_every=args.checkpoint_every,
+            limit=args.limit,
+            use_packing=not args.no_packing,
+            use_8bit_optim=not args.no_8bit_optim,
+            use_curriculum=not args.no_curriculum,
+            use_microcode_injection=not args.no_microcode,
+        )
+    except RuntimeError as e:
+        print(f"\n{'='*70}")
+        print(f"❌ TRAINING ERROR: {e}")
+        print(f"{'='*70}")
+        import traceback
+        traceback.print_exc()
+        
+        # OOM recovery
+        if 'out of memory' in str(e).lower():
+            print(f"\n💡 OOM FIX:")
+            print(f"   1. Restart runtime: Runtime → Restart session")
+            print(f"   2. Reduce settings:")
+            print(f"      --batch-size 1 --max-seq-len 256")
+            print(f"   3. Or use smaller config:")
+            print(f"      --config 80m")
+        
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n{'='*70}")
+        print(f"❌ UNEXPECTED ERROR: {type(e).__name__}: {e}")
+        print(f"{'='*70}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)

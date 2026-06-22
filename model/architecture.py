@@ -207,7 +207,9 @@ class GQA(nn.Module):
         # Causal mask + optional sliding window
         T_q = q.size(2)
         T_k = k.size(2)
-        causal = torch.tril(torch.ones(T_q, T_k, device=x.device, dtype=torch.bool))
+        # Build causal mask as 4D float (B, 1, T_q, T_k) — works with FP16 autocast
+        causal_2d = torch.tril(torch.ones(T_q, T_k, device=x.device, dtype=torch.bool))
+        causal_4d = causal_2d.unsqueeze(0).unsqueeze(0).expand(B, 1, T_q, T_k)
         
         # Sliding window
         if self.sliding_window > 0:
@@ -215,24 +217,19 @@ class GQA(nn.Module):
             for i in range(T_q):
                 start = max(0, i - self.sliding_window + 1)
                 window_mask[i, :start] = False
-            causal = causal & window_mask
+            causal_4d = causal_4d & window_mask.unsqueeze(0).unsqueeze(0)
         
-        # Padding mask: (B, T_k) → (B, 1, 1, T_k)
+        # Combine with padding mask if provided
         if attention_mask is not None:
-            # attention_mask: (B, T) with 1=valid, 0=padding
             pad_mask = attention_mask[:, :T_k].bool().unsqueeze(1).unsqueeze(2)  # (B, 1, 1, T_k)
-            # causal is (T_q, T_k), make it (B, 1, T_q, T_k)
-            causal_4d = causal.unsqueeze(0).unsqueeze(0).expand(B, 1, T_q, T_k)  # (B, 1, T_q, T_k)
-            full_mask = causal_4d & pad_mask  # (B, 1, T_q, T_k) — broadcast pad_mask over T_q
-            out = F.scaled_dot_product_attention(
-                q, k, v, attn_mask=full_mask,
-                dropout_p=self.attn_dropout if self.training else 0.0,
-            )
+            full_mask = causal_4d & pad_mask  # (B, 1, T_q, T_k)
         else:
-            out = F.scaled_dot_product_attention(
-                q, k, v, attn_mask=causal,
-                dropout_p=self.attn_dropout if self.training else 0.0,
-            )
+            full_mask = causal_4d
+        
+        out = F.scaled_dot_product_attention(
+            q, k, v, attn_mask=full_mask,
+            dropout_p=self.attn_dropout if self.training else 0.0,
+        )
         
         out = out.transpose(1, 2).contiguous().view(B, T_q, -1)
         return self.wo(out), new_kv
